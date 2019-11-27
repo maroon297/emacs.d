@@ -1,4 +1,4 @@
-﻿;;; package --- Summary
+﻿;; package --- Summary
 
 ;;; Commentary:
 ;;; Added by Package.el.  This must come before configurations of
@@ -7,7 +7,10 @@
 ;;; You may delete these explanatory comments.
 
 ;;; Code:
-(prefer-coding-system 'utf-8)
+(prefer-coding-system 'utf-8-unix)
+
+;; プロセスが出力する文字コードを判定して、process-coding-system の DECODING の設定値を決定する
+(setq default-process-coding-system '(undecided-dos . utf-8-unix))
 
 (package-initialize)
 
@@ -47,16 +50,21 @@
 ;;カラーテーマ設定
 
 ;; フォント設定
-(add-to-list 'default-frame-alist '(font . "Cica"))
-
-;; Japanese font
- (set-fontset-font t 'japanese-jisx0208 (font-spec :family "IPAGothic"))
+;; デフォルト フォント
+(set-face-attribute 'default nil :family "Migu 1M" :height 120)
+;; プロポーショナル フォント
+(set-face-attribute 'variable-pitch nil :family "Migu 1M" :height 120)
+;; 等幅フォント
+(set-face-attribute 'fixed-pitch nil :family "Migu 1M" :height 120)
+;; ツールチップ表示フォント
+(set-face-attribute 'tooltip nil :family "Migu 1M" :height 90)
 
 (global-set-key (kbd "<zenkaku-hankaku>") 'toggle-input-method)
 
-(package-initialize)
-
-(add-to-list 'load-path "~/.emacs.d/site-lisp")
+;;shellの設定
+(setq shell-file-name "/bin/bash")
+(setq shell-command-switch "-c")
+(setq explicit-shell-file-name shell-file-name)
 
 ;;------------------------;;
 
@@ -112,7 +120,7 @@
 (setq mouse-wheel-progressive-speed nil)
 
 ;; bufferの最後でカーソルを動かそうとしても音をならなくする
-(defun next-line (arg)
+(defun Next-line (arg)
   (interactive "p")
   (condition-case nil
       (line-move arg)
@@ -128,19 +136,19 @@
 ;;(global-hl-line-mode t)
 
 ;; スクリーンの最大化
-(set-frame-parameter nil 'fullscreen 'maximized)
+;;(set-frame-parameter nil 'fullscreen 'maximized)
 
 ;; 起動時のフレーム設定
-;;(setq initial-frame-alist
-;;   (append (list
+(setq initial-frame-alist
+   (append (list
 ;; 表示位置
-;;      '(top . 0)
-;;      '(left . 0)
+      '(top . 0)
+      '(left . 0)
 ;; サイズ
-;;      '(width . 150)  ;横
-;;      '(height . 60)) ;縦
-;;     initial-frame-alist))
-;;(setq default-frame-alist initial-frame-alist)
+      '(width . 230)  ;横
+      '(height . 53)) ;縦
+     initial-frame-alist))
+(setq default-frame-alist initial-frame-alist)
 
 ;;閉じ括弧を自動的に追加
 (electric-pair-mode 1)
@@ -161,21 +169,21 @@
 ;(el-get-bundle async)
 
 ;;Helm設定
-(el-get-bundle helm)
-(require 'helm-config)
-(helm-mode 1)
+;;(el-get-bundle helm)
+;(require 'helm-config)
+;(helm-mode 1)
 
 ;;helm-miniキーマップ
-(global-set-key (kbd "C-c h") 'helm-mini)
+;(global-set-key (kbd "C-c h") 'helm-mini)
 
 ;;M-xをhelm-M-xに
-(global-set-key (kbd "M-x") 'helm-M-x)
+;(global-set-key (kbd "M-x") 'helm-M-x)
 
 ;;キルリングを表示する
-(global-set-key (kbd "M-y") 'helm-show-kill-ring)
+;(global-set-key (kbd "M-y") 'helm-show-kill-ring)
 
 ;;helm-find-files
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
+;(global-set-key (kbd "C-x C-f") 'helm-find-files)
 
 
 (custom-set-variables
@@ -246,10 +254,6 @@
 (add-to-list 'auto-mode-alist '("\\.pu\\'" . plantuml-mode))
 (setq plantuml-options "-charset UTF-8")
 			 
-;;ensime
-(el-get-bundle ensime)
-(require 'ensime)
-(setq ensime-startup-notification nil)
 
 (el-get-bundle markdown-mode)
 (autoload 'markdown-mode "markdown-mode"
@@ -260,71 +264,16 @@
 ;; markdownのコマンドのパス追加
 (setq markdown-command "jq --slurp --raw-input '{\"text\": \"\\(.)\", \"mode\": \"gfm\"}' | curl -sS --data @- https://api.github.com/markdown")
 
-;;helm-gtags
-(el-get-bundle helm-gtags)
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+(fset 'package-desc-vers 'package--ac-desc-version)
+(package-initialise)
 
-;;html live preview
-(el-get-bundle skeeto/impatient-mode)
-(el-get-bundle skeeto/emacs-web-server)
-(el-get-bundle htmlize)
-
-;########################################
-; web-mode setting
-;#######################################
-
-(el-get-bundle fxbois/web-mode)
-(require 'web-mode)
-
-(add-to-list 'auto-mode-alist '("\\.jsp$"       . web-mode))
-(add-to-list 'auto-mode-alist '("\\.html?$"     . web-mode))
-
-(defun web-mode-hook ()
-  "Hooks for Web mode."
-
-  ;; indent
-  (setq web-mode-html-offset   2)
-  (setq web-mode-style-padding 2)
-  (setq web-mode-css-offset    2)
-  (setq web-mode-script-offset 2)
-  (setq web-mode-java-offset   2)
-  (setq web-mode-asp-offset    2)
-  (setq web-mode-markup-indent-offset 2)
-
-  (local-set-key (kbd "C-m") 'newline-and-indent)
-  
-  ;; auto tag closing
-  ;0=no auto-closing
-  ;1=auto-close with </
-  ;2=auto-close with > and </
-  (setq web-mode-tag-auto-close-style 2)
-)
-(add-hook 'web-mode-hook 'web-mode-hook)
-
-;;mozc
-(require 'mozc)  ; or (load-file "/path/to/mozc.el")
-(setq default-input-method "japanese-mozc")
-(setq mozc-candidate-style 'overlay)
-
-;; magit
-(el-get-bundle magit/transient)
-(el-get-bundle magit)
-(global-set-key (kbd "C-x g") 'magit-status)
-
-;; vue-mode
-(el-get-bundle mmm-mode)
-(el-get-bundle AdamNiederer/vue-mode)
-(el-get-bundle AdamNiederer/vue-html-mode)
-(el-get-bundle AdamNiederer/ssass-mode)
-(el-get-bundle Fanael/edit-indirect)
-(el-get-bundle codesuki/add-node-modules-path)
-(require 'flycheck)
-(add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
-(eval-after-load 'vue-mode
-  '(add-hook 'vue-mode-hook #'add-node-modules-path))
-(flycheck-add-mode 'javascript-eslint 'vue-mode)
-(flycheck-add-mode 'javascript-eslint 'vue-html-mode)
-(flycheck-add-mode 'javascript-eslint 'css-mode)
-(add-hook 'vue-mode-hook 'flycheck-mode)
+;;; mozc
+(require 'mozc)                                 ; mozcの読み込み
+(set-language-environment "Japanese")           ; 言語環境を"japanese"に
+(setq default-input-method "japanese-mozc")     ; IMEをjapanes-mozcに
+(prefer-coding-system 'utf-8)                   ; デフォルトの文字コードをUTF-8に
 
 ;;; init.el ends here
-
