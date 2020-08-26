@@ -1,3 +1,4 @@
 #elget‚ÍƒKƒ‚¾‚¯‚Ù‚µ‚¢
-el-get/*
+elpa/*
+.extension
 !el-get/.gitkeep
