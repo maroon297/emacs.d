@@ -236,17 +236,55 @@
   (global-company-mode t)
   )
 
-(use-package flymake)
-(use-package rustic)
-(setq rustic-lsp-server 'rust-analyzer)
-(setq lsp-rust-analyzer-server-command '("~/.cargo/bin/rust-analyzer"))
+(use-package yasnippet
+  :ensure t
+  :diminish yas-minor-mode
+  :bind (:map yas-minor-mode-map
+              ("C-c s i" . yas-insert-snippet)
+              ("C-c s n" . yas-new-snippet)
+              ("C-c s v" . yas-visit-snippet-file)
+              ("C-c s l" . yas-describe-tables)
+              ("C-c s g" . yas-reload-all))              
+  :config
+  (yas-global-mode 1)
+  (setq yas-prompt-functions '(yas-ido-prompt))
+  )
+
+(add-to-list 'exec-path (expand-file-name "~/.cargo/bin"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; #rust
+
+(use-package rust-mode
+  :ensure t
+  :custom rust-format-on-save t)
+
+
+(use-package cargo
+  :ensure t
+  :hook (rust-mode . cargo-minor-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; #lsp
+
+(use-package lsp-mode
+  :ensure t
+  :init (yas-global-mode)
+  :hook (rust-mode . lsp)
+  :bind ("C-c h" . lsp-describe-thing-at-point)
+  :custom (lsp-rust-server 'rust-analyzer))
+(use-package lsp-ui
+  :ensure t)
+
 ;;; init.el ends here
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (company lsp-mode magit counsel use-package))))
+ '(package-selected-packages
+   (quote
+    (yasnippet lsp-ui cargo rust-mode company lsp-mode magit counsel use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

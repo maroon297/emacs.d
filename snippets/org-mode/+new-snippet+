@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: jekyll
+# key: jkl
+# --
+
+#+LAYOUT: post
+#+TITLE: $0
+#+TAGS: $1
